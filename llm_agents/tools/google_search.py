@@ -1,7 +1,7 @@
 # Based on https://raw.githubusercontent.com/hwchase17/langchain/master/langchain/utilities/google_search.py
 
 import os
-from typing import Any
+from typing import Any, Dict, List
 from llm_agents.tools.base import ToolInterface
 from googleapiclient.discovery import build
 
@@ -44,11 +44,14 @@ URL for it: https://console.cloud.google.com/apis/library/customsearch.googleapi
 """
 
 
-def _google_search_results(params) -> list[dict[str, Any]]:
-    service = build("customsearch", "v1", developerKey=params['api_key'])
-    res = service.cse().list(
-        q=params['q'], cx=params['cse_id'], num=params['max_results']).execute()
-    return res.get('items', [])
+def _google_search_results(params) -> List[Dict[str, Any]]:
+    service = build("customsearch", "v1", developerKey=params["api_key"])
+    res = (
+        service.cse()
+        .list(q=params["q"], cx=params["cse_id"], num=params["max_results"])
+        .execute()
+    )
+    return res.get("items", [])
 
 
 def search(query: str) -> str:
@@ -56,7 +59,7 @@ def search(query: str) -> str:
         "q": query,
         "cse_id": os.environ["GOOGLE_CSE_ID"],
         "api_key": os.environ["GOOGLE_API_KEY"],
-        "max_results": 10
+        "max_results": 10,
     }
 
     res = _google_search_results(params)
@@ -80,7 +83,7 @@ class GoogleSearchTool(ToolInterface):
         return search(input_text)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     s = GoogleSearchTool()
     res = s.use("Who was the pope in 2023?")
     print(res)

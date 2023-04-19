@@ -3,10 +3,13 @@ import os
 
 from pydantic import BaseModel
 from typing import List
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class ChatLLM(BaseModel):
-    model: str = 'gpt-3.5-turbo'
+    model: str = "gpt-3.5-turbo"
     temperature: float = 0.0
     openai.api_key = os.environ["OPENAI_API_KEY"]  # Credentials setup
 
@@ -15,11 +18,12 @@ class ChatLLM(BaseModel):
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
             temperature=self.temperature,
-            stop=stop
+            stop=stop,
         )
         return response.choices[0].message.content
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     llm = ChatLLM()
-    result = llm.generate(prompt='Who is the president of the USA?')
+    result = llm.generate(prompt="Who is the president of the USA?")
     print(result)

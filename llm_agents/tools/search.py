@@ -5,8 +5,10 @@ import sys
 from typing import Any
 
 from llm_agents.tools.base import ToolInterface
-
+from dotenv import load_dotenv
 from serpapi import GoogleSearch
+
+load_dotenv()
 
 
 def search(query: str) -> str:
@@ -16,7 +18,7 @@ def search(query: str) -> str:
         "gl": "us",
         "hl": "en",
         "q": query,
-        "api_key": os.environ["SERPAPI_API_KEY"]
+        "api_key": os.environ["SERPAPI_API_KEY"],
     }
 
     with HiddenPrints():
@@ -78,10 +80,10 @@ class SerpAPITool(ToolInterface):
     description = "Get specific information from a search query. Input should be a  question like 'How to add number in Clojure?'. Result will be the answer to the question."
 
     def use(self, input_text: str) -> str:
-        return search(input_text) 
+        return search(input_text)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     s = SerpAPITool()
     res = s.use("Who is the pope in 2023?")
     print(res)

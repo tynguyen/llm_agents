@@ -1,6 +1,8 @@
 import os
-from typing import Any
+from typing import Any, List, Dict
 from llm_agents.tools.base import ToolInterface
+from typing_extensions import TypedDict
+
 import requests
 import json
 
@@ -18,17 +20,17 @@ Set the URL of the Searx instance to the environment variable SEARX_INSTANCE_URL
 """
 
 
-def _searx_search_results(params) -> list[dict[str, Any]]:
+def _searx_search_results(params) -> List[Dict[str, Any]]:
     search_params = {
-        "q": params['q'],
+        "q": params["q"],
         "safesearch": 0,
         "format": "json",
     }
 
-    if params['safesearch']:
-        search_params['safesearch'] = 1
+    if params["safesearch"]:
+        search_params["safesearch"] = 1
 
-    res = requests.post(params['instance_url'], data=search_params)
+    res = requests.post(params["instance_url"], data=search_params)
     json_results = json.loads(res.content)
     return json_results
 
@@ -39,28 +41,32 @@ def search(query: str) -> str:
         "instance_url": os.environ["SEARX_INSTANCE_URL"],
         "method": "POST",
         "safesearch": False,
-        "max_results": 10
+        "max_results": 10,
     }
 
     res = _searx_search_results(params)
 
-    if (len(res) == 0 or (len(res['answers']) == 0 and len(res['infoboxes']) == 0 and len(res['results']) == 0)):
+    if len(res) == 0 or (
+        len(res["answers"]) == 0
+        and len(res["infoboxes"]) == 0
+        and len(res["results"]) == 0
+    ):
         return "No good Searx Search Result was found"
 
     toret = []
 
-    if len(res['answers']) > 0:
-        for result in res['answers']:
+    if len(res["answers"]) > 0:
+        for result in res["answers"]:
             if "content" in result:
                 toret.append(result["content"])
 
-    elif len(res['infoboxes']) > 0:
-        for result in res['infoboxes']:
+    elif len(res["infoboxes"]) > 0:
+        for result in res["infoboxes"]:
             if "content" in result:
                 toret.append(result["content"])
 
-    elif len(res['results']) > 0:
-        for result in res['results'][:params['max_results']]:
+    elif len(res["results"]) > 0:
+        for result in res["results"][: params["max_results"]]:
             if "content" in result:
                 toret.append(result["content"])
 
@@ -81,7 +87,7 @@ class SearxSearchTool(ToolInterface):
         return search(input_text)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     s = SearxSearchTool()
     res = s.use("Who was the pope in 2023?")
     print(res)
