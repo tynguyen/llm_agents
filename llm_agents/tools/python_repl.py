@@ -48,8 +48,8 @@ class PythonREPLTool(ToolInterface):
         return self.python_repl.run(input_text)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     repl_tool = PythonREPLTool()
-    result = repl_tool.use('print(5 * 7)')
+    result = repl_tool.use("print(5 * 7)")
     assert result == "35\n"
     print(result)
